@@ -9,7 +9,6 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QWidget,
 from PySide6.QtCore import Qt, QThread, Signal
 import PySide6.QtGui as QtGui
 
-# /boost
 
 def garantir_motor(signal_fim):
     import os, urllib.request, zipfile, shutil
@@ -46,7 +45,6 @@ def garantir_motor(signal_fim):
     return ffmpeg_exe, ffprobe_exe
 
 class fundo_widget(QWidget):
-    # /boost
     def __init__(self, parent=None):
         super().__init__(parent)
         from PySide6.QtGui import QPixmap
@@ -64,7 +62,6 @@ class fundo_widget(QWidget):
 
 # thread yt-dlp baixar
 class thread_baixar(QThread):
-    # /boost
     fim = Signal(str)
     
     def __init__(self, link, qual, is_audio, destino, fmt_audio="mp3"):
@@ -134,7 +131,6 @@ class thread_baixar(QThread):
 
 # thread ffmpeg converter
 class thread_converter(QThread):
-    # /boost
     fim = Signal(str)
     
     def __init__(self, arq, fmt, qual, destino):
@@ -178,7 +174,6 @@ class thread_converter(QThread):
 
 # thread ffmpeg comprimir
 class thread_comprimir(QThread):
-    # /boost
     fim = Signal(str)
     
     def __init__(self, arq, peso, qual, destino):
@@ -235,7 +230,6 @@ class thread_comprimir(QThread):
             self.fim.emit(f"erro: {str(e)[:40]}".lower())
 
 class eto_app(QMainWindow):
-    # /boost
     def __init__(self):
         super().__init__()
         
