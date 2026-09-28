@@ -67,7 +67,8 @@ class thread_baixar(QThread):
     # /boost
     fim = Signal(str)
     
-    def __init__(self, link, qual, is_audio, destino):
+    def __init__(self, link, qual, is_audio, destino, fmt_audio="mp3"):
+        self.fmt_audio = fmt_audio
         super().__init__()
         self.link = link
         self.qual = qual
@@ -110,7 +111,7 @@ class thread_baixar(QThread):
                     'format': 'bestaudio/best',
                     'postprocessors': [{
                         'key': 'FFmpegExtractAudio',
-                        'preferredcodec': 'mp3',
+                        'preferredcodec': self.fmt_audio,
                         'preferredquality': qual_kbps,
                     }],
                 })
@@ -381,9 +382,17 @@ class eto_app(QMainWindow):
         hbox.addWidget(self.rad_audio)
         l.addLayout(hbox)
         
+        hb_qual = QHBoxLayout()
         self.qual_baixar = QComboBox()
+        hb_qual.addWidget(self.qual_baixar)
+        
+        self.fmt_audio_baixar = QComboBox()
+        self.fmt_audio_baixar.addItems(["mp3", "wav", "flac", "m4a", "opus"])
+        self.fmt_audio_baixar.hide()
+        hb_qual.addWidget(self.fmt_audio_baixar)
+        l.addLayout(hb_qual)
+        
         self.muda_qual_baixar()
-        l.addWidget(self.qual_baixar)
         
         self.rad_video.toggled.connect(self.muda_qual_baixar)
         self.rad_audio.toggled.connect(self.muda_qual_baixar)
@@ -398,8 +407,10 @@ class eto_app(QMainWindow):
         self.qual_baixar.clear()
         if self.rad_video.isChecked():
             self.qual_baixar.addItems(["4k - braba", "1080p - ok", "720p - de boa", "480p - podre"])
+            if hasattr(self, 'fmt_audio_baixar'): self.fmt_audio_baixar.hide()
         else:
             self.qual_baixar.addItems(["320kbps - super braba", "192kbps - braba", "128kbps - ok", "64kbps - podre"])
+            if hasattr(self, 'fmt_audio_baixar'): self.fmt_audio_baixar.show()
 
     def acao_baixar(self):
         if not self.link.text(): return
@@ -408,7 +419,8 @@ class eto_app(QMainWindow):
             return
         self.lbl_status.setText("baixando...")
         self.btn_vai_baixar.setDisabled(True)
-        self.th_baixar = thread_baixar(self.link.text(), self.qual_baixar.currentText(), self.rad_audio.isChecked(), destino)
+        fmt_audio = self.fmt_audio_baixar.currentText() if self.rad_audio.isChecked() else "mp3"
+        self.th_baixar = thread_baixar(self.link.text(), self.qual_baixar.currentText(), self.rad_audio.isChecked(), destino, fmt_audio)
         self.th_baixar.fim.connect(self.fim_acao)
         self.th_baixar.start()
 
